@@ -1,0 +1,55 @@
+dataset:
+  data_file_name: 'channel_mmWave.mat'
+  batch_size: 32
+  snr_db: 60
+  mod_order: 16
+  ref_conf_dict:
+    'dmrs': [0, 3072, 1]
+    'ptrs': [6, 3072, 48]
+  num_guard_subcarriers: 1024
+  rnd_seed: 0
+  num_workers: 0
+  is_phase_noise: True
+  is_channel: True
+  is_noise: True
+
+training:
+  lr: 0.0001
+  weight_decay: 0.000001
+  max_norm: 1.0
+  num_iter: 1000000
+  logging_step: 10
+  evaluation_step: 5000
+  evaluation_batch_size: 4
+
+ch_estimation:
+  cond:
+    in_channels: 2
+    step_size: 64
+    steps_per_token: 1  # cond_n_token = 3072 / 64 = 48, cond_d_model = 64 * 2 = 128
+  transformer:
+    length: 256  # CP length: 288
+    channels: 2
+    num_layers: 2
+    d_model: 128
+    n_token: 64  # step_size = 256(length) * 2(channels) / 64(n_token) = 8
+    n_head: 4
+    dim_feedforward: 128
+    dropout: 0.0
+    activation: 'relu'
+
+pn_estimation:
+  cond:
+    in_channels: 2
+    step_size: 64
+    steps_per_token: 1  # cond_n_token = 3072 / 64 = 48, cond_d_model = 64 * 2 = 128
+  transformer:
+    length: 14  # CP length: 288
+    channels: 1
+    num_layers: 2
+    d_model: 32
+    n_token: 14  # step_size = 14(length) * 1(channels) / 14(n_token) = 1
+    n_head: 4
+    dim_feedforward: 32
+    dropout: 0.0
+    activation: 'relu'
